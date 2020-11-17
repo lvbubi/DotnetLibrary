@@ -30,5 +30,11 @@ namespace netcore_gyakorlas.Controllers
             var author = _authorService.Create(newAuthor);
             return Created($"{author.Id}", author);
         }
+        
+        [HttpGet("{name}")]
+        public IActionResult GetByName(string name)
+        {
+            return Ok(_authorService.GetByName(name));
+        }
     }
 }

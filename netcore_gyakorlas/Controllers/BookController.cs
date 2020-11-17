@@ -30,5 +30,17 @@ namespace netcore_gyakorlas.Controllers
             var book = _bookService.Create(newBook);
             return Created($"{book.Id}", book);
         }
+        
+        [HttpGet("{title}")]
+        public ActionResult<Book> GetByTitle(string title)
+        {
+            return Ok(_bookService.GetByTitle(title));
+        }
+        
+        [HttpGet("{authorId}")]
+        public ActionResult<IEnumerable<Book>> GetByAuthor(int authorId)
+        {
+            return Ok(_bookService.GetByAuthor(authorId));
+        }
     }
 }

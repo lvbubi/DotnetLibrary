@@ -19,30 +19,5 @@ namespace netcore_gyakorlas.Controllers
         {
             _libraryService = libraryService;
         }
-        
-        [HttpGet]
-        public ActionResult<IEnumerable<Book>> GetAll()
-        {
-            return Ok(_bookService.GetAll());
-        }
-        
-        [HttpGet("{title}")]
-        public ActionResult<Book> GetByTitle(string title)
-        {
-            return Ok(_libraryService.GetByTitle(title));
-        }
-        
-        [HttpGet("{authorId}")]
-        public ActionResult<IEnumerable<Book>> GetByAuthor(int authorId)
-        {
-            return Ok(_libraryService.GetByAuthor(authorId));
-        }
-        
-        [HttpPost]
-        public IActionResult CreateAuthor([FromBody] Author newAuthor)
-        {
-            var author = _authorService.Create(newAuthor);
-            return Created($"{author.Id}", author);
-        }
     }
 }

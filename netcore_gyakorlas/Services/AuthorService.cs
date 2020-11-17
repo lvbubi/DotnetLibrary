@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using EventApp.Services;
 using Microsoft.Extensions.Logging;
 using netcore_gyakorlas.Models;
@@ -13,6 +14,7 @@ namespace netcore_gyakorlas.Services
         Author Get(int id);
         Author Create(Author newBook);
         Author Update(int bookId, Author updatedBook);
+        Author GetByName(string name);
         IEnumerable<Author> Delete(int bookId);
     }
     
@@ -60,6 +62,13 @@ namespace netcore_gyakorlas.Services
             UnitOfWork.GetRepository<Author>().Update(authorId, updatedAuthor);
             UnitOfWork.SaveChanges();
             return updatedAuthor;
+        }
+
+        public Author GetByName(string name)
+        {
+            Log("GetByName(" + name + ")");
+            return UnitOfWork.GetRepository<Author>().GetAsQueryable()
+                .First(author => author.Name.Equals(name));
         }
 
         public IEnumerable<Author> Delete(int authorId)
