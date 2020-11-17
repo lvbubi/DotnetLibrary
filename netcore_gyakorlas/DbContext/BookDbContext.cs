@@ -14,17 +14,5 @@ namespace netcore_gyakorlas.Context
         {
 
         }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            //modelBuilder.Entity<Book>().HasOne(e => e.Author).WithMany(p => p.Events).HasForeignKey(e => e.PlaceIdentity);
-
-            //modelBuilder.Entity<EventStaff>().HasKey(es => new { es.EventId, es.OrganizerId });
-            //modelBuilder.Entity<EventStaff>().HasOne(es => es.Event).WithMany(e => e.Staff).HasForeignKey(es => es.EventId);
-            //modelBuilder.Entity<EventStaff>().HasOne(es => es.Organizer).WithMany(o => o.Events).HasForeignKey(es => es.OrganizerId);
-
-            //modelBuilder.RemoveOneToManyCascadeDeleteConvention();
-            base.OnModelCreating(modelBuilder);
-        }
     }
 }

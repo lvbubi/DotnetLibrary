@@ -1,17 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using netcore_gyakorlas.Context;
+using netcore_gyakorlas.Services;
 using netcore_gyakorlas.UnitOfWork;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -25,7 +21,7 @@ namespace netcore_gyakorlas
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -36,7 +32,7 @@ namespace netcore_gyakorlas
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-                    options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     options.SerializerSettings.TypeNameHandling = TypeNameHandling.Objects;
                     options.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -60,6 +56,11 @@ namespace netcore_gyakorlas
                 options.UseSqlServer(Configuration.GetConnectionString("BookDatabase")));
 
             services.AddScoped<IUnitOfWork, UnitOfWork<BookDbContext>>();
+
+            services.AddScoped<ILibraryService, LibraryService>();
+            services.AddScoped<IAuthorService, AuthorService>();
+            services.AddScoped<IBookService, BookService>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
