@@ -11,5 +11,6 @@ namespace netcore_gyakorlas.Models
         public int PublishedYear { get; set; }
         public int PageNumber { get; set; }
         public string ISBN { get; set; }
+        public int ageLimit { get; set; }
     }
 }
