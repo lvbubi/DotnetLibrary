@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using netcore_gyakorlas.Models;
 using netcore_gyakorlas.Services;
 
@@ -12,12 +11,23 @@ namespace netcore_gyakorlas.Controllers
     public class LibraryController : ControllerBase
     {
         private readonly ILibraryService _libraryService;
-        private readonly IAuthorService _authorService;
-        private readonly IBookService _bookService;
 
-        public LibraryController(ILibraryService libraryService, IBookService bookService, IAuthorService authorService)
+        public LibraryController(ILibraryService libraryService)
         {
             _libraryService = libraryService;
+        }
+        
+        [HttpGet]
+        public ActionResult<IEnumerable<Library>> GetAll()
+        {
+            return Ok(_libraryService.GetAll());
+        }
+
+        [HttpPost]
+        public IActionResult Create([FromBody] Library newLibrary)
+        {
+            var library = _libraryService.Create(newLibrary);
+            return Created($"{library.Id}", library);
         }
     }
 }

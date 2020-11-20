@@ -19,6 +19,8 @@ namespace netcore_gyakorlas.Services
         
         public Book GetByTitle(string title);
         IEnumerable<Book> GetByAuthor(int authorId);
+
+        IEnumerable<Book> GetByYear(int year);
     }
     
     
@@ -91,6 +93,13 @@ namespace netcore_gyakorlas.Services
             return UnitOfWork.GetRepository<Book>().GetAsQueryable()
                 .Where(book => book.Author.Id.Equals(authorId))
                 .Include(book => book.Author);
+        }
+
+        public IEnumerable<Book> GetByYear(int year)
+        {
+            Log("GetByYear(" + year + ")");
+            return UnitOfWork.GetRepository<Book>().GetAsQueryable()
+                .Where(book => book.PublishedYear.Equals(year));
         }
     }
 }

@@ -57,6 +57,7 @@ namespace netcore_gyakorlas
 
             services.AddScoped<IUnitOfWork, UnitOfWork<BookDbContext>>();
 
+            services.AddScoped<IBookLibraryService, BookLibraryService>();
             services.AddScoped<ILibraryService, LibraryService>();
             services.AddScoped<IAuthorService, AuthorService>();
             services.AddScoped<IBookService, BookService>();

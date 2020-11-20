@@ -36,7 +36,7 @@ namespace netcore_gyakorlas.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Author");
+                    b.ToTable("Authors");
                 });
 
             modelBuilder.Entity("netcore_gyakorlas.Models.Book", b =>
@@ -68,11 +68,63 @@ namespace netcore_gyakorlas.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("netcore_gyakorlas.Models.BookLibrary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LibraryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("LibraryId");
+
+                    b.ToTable("BookLibraries");
+                });
+
+            modelBuilder.Entity("netcore_gyakorlas.Models.Library", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Library");
+                });
+
             modelBuilder.Entity("netcore_gyakorlas.Models.Book", b =>
                 {
                     b.HasOne("netcore_gyakorlas.Models.Author", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("netcore_gyakorlas.Models.BookLibrary", b =>
+                {
+                    b.HasOne("netcore_gyakorlas.Models.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("netcore_gyakorlas.Models.Library", "Library")
+                        .WithMany()
+                        .HasForeignKey("LibraryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

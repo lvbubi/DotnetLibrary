@@ -42,5 +42,11 @@ namespace netcore_gyakorlas.Controllers
         {
             return Ok(_bookService.GetByAuthor(authorId));
         }
+        
+        [HttpGet("{authorId}")]
+        public ActionResult<IEnumerable<Book>> GetByYear(int year)
+        {
+            return Ok(_bookService.GetByYear(year));
+        }
     }
 }
