@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authorization;
 using netcore_gyakorlas.Context;
 using netcore_gyakorlas.Middleware;
 using netcore_gyakorlas.Models;
+using netcore_gyakorlas.Policy;
 using netcore_gyakorlas.Services;
 using netcore_gyakorlas.UnitOfWork;
 
@@ -128,6 +129,13 @@ namespace netcore_gyakorlas
                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
                     };
                 });
+            
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AtLeast12", policy => policy.Requirements.Add(new MinimumAgeRequirement(12)));
+            });
+            
+            services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
             
             /*services.AddAuthorization(options =>
             {

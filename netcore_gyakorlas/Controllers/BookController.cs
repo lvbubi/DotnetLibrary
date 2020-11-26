@@ -52,6 +52,7 @@ namespace netcore_gyakorlas.Controllers
             return Ok(_bookService.GetByYear(year));
         }
 
+        [Authorize(Policy = "AtLeast12")]
         [Authorize(Roles = "User")]
         [HttpGet]
         public ActionResult<IEnumerable<Book>> GetAllLimited()
