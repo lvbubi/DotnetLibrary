@@ -133,14 +133,14 @@ namespace netcore_gyakorlas
                     };
                 });
                         
-            /*services.AddAuthorization(options =>
+            services.AddAuthorization(options =>
             {
                 var policy = options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("Bearer")
-                    .RequireRole("Admin", "User")
+                    .RequireRole("Administrator", "User")
                     .Build();
-            });*/
+            });
             
             //services.AddSingleton<IAuthorizationPolicyProvider, MinimumAgePolicyProvider>();
         }
@@ -163,8 +163,9 @@ namespace netcore_gyakorlas
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-            
+
             app.UseMiddleware<GuidMiddleware>();
 
             app.UseEndpoints(endpoints =>

@@ -30,7 +30,7 @@ namespace netcore_gyakorlas.Middleware
             JObject json = String.IsNullOrEmpty(requestBodyContent) ? new JObject() : JObject.Parse(requestBodyContent);
  
             Guid guid = Guid.NewGuid();
-            json.Add("guid", guid);
+            //json.Add("guid", guid);
             context.Request.Body = GenerateStreamFromString(json.ToString());
             
             //Sad logic

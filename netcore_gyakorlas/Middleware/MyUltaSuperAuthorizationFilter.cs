@@ -1,4 +1,4 @@
-using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +12,27 @@ namespace netcore_gyakorlas.Middleware
 
         public MyUltaSuperAuthorizationFilter(AuthorizationPolicy policy): base(policy) {}
         
-        public override Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        public async override Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             base.OnAuthorizationAsync(context);
 
+            bool hasAllowAnonymous = context.ActionDescriptor.EndpointMetadata
+                .Any(em => em.GetType() == typeof(AllowAnonymousAttribute)); //< -- Here it is
+
+            if (hasAllowAnonymous)
+            {
+                return;
+            }
+            
             if (context.HttpContext.User.IsInRole("Administrator"))
             {
-                return Task.CompletedTask;
+                return;
             }
 
             if (context.HttpContext.Request.Method == "POST")
             {
                 context.Result = new ForbidResult("Bearer");
             }
-
-            return Task.CompletedTask;
         }
     }
 }

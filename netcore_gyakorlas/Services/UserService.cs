@@ -22,6 +22,8 @@ namespace EventApp.Services
         IQueryable<ApplicationUser> GetUsers();
 
         Task Logout();
+
+        Task<ApplicationUser> RegisterAsync(RegisterRequest registerRequest);
     }
 
     public class UserService : IUserService
@@ -41,6 +43,26 @@ namespace EventApp.Services
             _roleManager = roleManager;
         }
 
+        public async Task<ApplicationUser> RegisterAsync(RegisterRequest registerRequest)
+        {
+            ApplicationUser user = new ApplicationUser()
+            {
+                Email = registerRequest.Email,
+                Enabled = true,
+                UserName = registerRequest.UserName,
+                EmailConfirmed = true,
+                DoB = registerRequest.DoB
+            };
+            
+            var result = await _userManager.CreateAsync(user, registerRequest.Password);
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "User");
+            }
+
+            return user;
+        }
+        
         public async Task InitAsync()
         {
             var role = await _roleManager.FindByNameAsync("Administrator");

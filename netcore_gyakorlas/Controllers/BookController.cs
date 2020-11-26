@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using netcore_gyakorlas.Models;
@@ -18,12 +19,13 @@ namespace netcore_gyakorlas.Controllers
             _bookService = bookService;
         }
         
+        [Authorize(Roles = "Administrator")]
         [HttpGet]
         public ActionResult<IEnumerable<Book>> GetAll()
         {
             return Ok(_bookService.GetAll());
         }
-
+        
         [HttpPost]
         public IActionResult Create([FromBody] Book newBook)
         {

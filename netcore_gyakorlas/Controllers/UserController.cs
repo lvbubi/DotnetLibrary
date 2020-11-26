@@ -25,6 +25,14 @@ namespace EventApp.Controllers
             var result = await _userService.LoginAsync(data);
             return Ok(result);
         }
+        
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest data)
+        {
+            var result = await _userService.RegisterAsync(data);
+            return Ok(result);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Init()
