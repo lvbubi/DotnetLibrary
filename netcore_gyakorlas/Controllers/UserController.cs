@@ -1,7 +1,8 @@
 ﻿﻿using System.Threading.Tasks;
 using EventApp.Models.Communication;
 using EventApp.Services;
-using Microsoft.AspNetCore.Mvc;
+ using Microsoft.AspNetCore.Authorization;
+ using Microsoft.AspNetCore.Mvc;
 
 namespace EventApp.Controllers
 {
@@ -17,6 +18,7 @@ namespace EventApp.Controllers
             _userService = userService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequest data)
         {
@@ -35,6 +37,12 @@ namespace EventApp.Controllers
         public async Task<IActionResult> GetAll()
         {
             return Ok(_userService.GetUsers());
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            return Ok(_userService.Logout());
         }
     }
 }

@@ -20,6 +20,8 @@ namespace EventApp.Services
         Task InitAsync();
 
         IQueryable<ApplicationUser> GetUsers();
+
+        Task Logout();
     }
 
     public class UserService : IUserService
@@ -116,7 +118,11 @@ namespace EventApp.Services
                 }
             }
             throw new ApplicationException("INVALID_LOGIN_ATTEMPT");
+        }
 
+        public async Task Logout()
+        {
+            await _signInManager.SignOutAsync();
         }
 
         private async Task<string> GenerateJwtToken(ApplicationUser user)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using EventApp.Models;
 using EventApp.Services;
 using Microsoft.AspNetCore.Builder;
@@ -17,6 +18,8 @@ using Newtonsoft.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.Tasks;
+using EventApp.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using netcore_gyakorlas.Context;
 using netcore_gyakorlas.Middleware;
 using netcore_gyakorlas.Models;
@@ -100,6 +103,34 @@ namespace netcore_gyakorlas
                 options.User.AllowedUserNameCharacters =
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = true;
+            });
+            
+            services.AddAuthentication()
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.RequireHttpsMetadata = false;
+                    cfg.SaveToken = true;
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = "https://mik.uni-pannon.hu",
+                        ValidateAudience = true,
+                        ValidAudience = "https://mik.uni-pannon.hu",
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SecretKey_123456")),
+                        ValidateIssuerSigningKey = true,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero // remove delay of token when expire
+                    };
+                });
+                        
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .AddAuthenticationSchemes("Bearer")
+                    .Build();
+
+                // Register other policies here
             });
             
         }

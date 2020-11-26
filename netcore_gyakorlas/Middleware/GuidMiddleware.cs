@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace netcore_gyakorlas.Middleware
@@ -25,31 +24,43 @@ namespace netcore_gyakorlas.Middleware
                 await _next(context);
                 return;
             }
-
-            var requestBodyContent = await GetRequestBodyContent(context.Request);
-            JObject json = JObject.Parse(requestBodyContent);
-            json.Add("guid", "random");
-            byte[] byteArray = Encoding.ASCII.GetBytes(json.ToString());
-            MemoryStream stream = new MemoryStream( byteArray ); 
-            context.Request.Body = stream;
             
+            var requestBodyContent = await GetRequestBodyContent(context.Request);
+
+            JObject json = String.IsNullOrEmpty(requestBodyContent) ? new JObject() : JObject.Parse(requestBodyContent);
+ 
+            Guid guid = Guid.NewGuid();
+            json.Add("guid", guid);
+            context.Request.Body = GenerateStreamFromString(json.ToString());
+            
+            //Sad logic
             var originalBodyStream = context.Response.Body;
-            using (var responseBody = new MemoryStream())
-            {
-                var response = context.Response;
-                response.Body = responseBody;
+            var response = context.Response;
+            response.Body = new MemoryStream();
 
-                await _next(context);
+            await _next(context);
+            
+            //process and edit response
+            JObject resultJson = await createResponseJson(context, guid);
+            byte[] resultByteArray = Encoding.ASCII.GetBytes(resultJson.ToString());
 
-                var responseBodyContent = await GetResponseBodyContent(context.Response);
-
-                response.ContentLength = byteArray.Length;
-                await originalBodyStream.WriteAsync(byteArray);
-
-                //await responseBody.CopyToAsync(originalBodyStream);
-            }
+            response.ContentLength = resultByteArray.Length;
+            await originalBodyStream.WriteAsync(resultByteArray);
         }
-        
+
+        private async Task<JObject> createResponseJson(HttpContext context, Guid guid)
+        {
+            var responseBodyContent = await GetResponseBodyContent(context.Response);
+            JObject resultJson = new JObject
+            {
+                {"content", JContainer.Parse(responseBodyContent)},
+                {"statusCode", context.Response.StatusCode},
+                {"identity", guid}
+            };
+
+            return resultJson;
+        }
+
         private Stream GenerateStreamFromString(string s)
         {
             var stream = new MemoryStream();
