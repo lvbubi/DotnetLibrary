@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using EventApp.Models;
 using EventApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,11 +13,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Threading.Tasks;
-using EventApp.Controllers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Mvc.Filters;
 using netcore_gyakorlas.Context;
 using netcore_gyakorlas.Middleware;
 using netcore_gyakorlas.Models;
@@ -60,8 +53,7 @@ namespace netcore_gyakorlas
                     options.SerializerSettings.TypeNameHandling = TypeNameHandling.Objects;
                     options.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                })
-                ;
+                });
 
             JsonConvert.DefaultSettings = () =>
             {
@@ -115,7 +107,11 @@ namespace netcore_gyakorlas
                 options.User.RequireUniqueEmail = true;
             });
             
-            services.AddAuthentication()
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = "Bearer";
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(cfg =>
                 {
                     cfg.RequireHttpsMetadata = false;
@@ -132,17 +128,15 @@ namespace netcore_gyakorlas
                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
                     };
                 });
-                        
-            services.AddAuthorization(options =>
+            
+            /*services.AddAuthorization(options =>
             {
                 var policy = options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("Bearer")
                     .RequireRole("Administrator", "User")
                     .Build();
-            });
-            
-            //services.AddSingleton<IAuthorizationPolicyProvider, MinimumAgePolicyProvider>();
+            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
