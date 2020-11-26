@@ -28,24 +28,23 @@ namespace netcore_gyakorlas.Middleware
             var requestBodyContent = await GetRequestBodyContent(context.Request);
 
             JObject json = String.IsNullOrEmpty(requestBodyContent) ? new JObject() : JObject.Parse(requestBodyContent);
- 
             Guid guid = Guid.NewGuid();
             //json.Add("guid", guid);
             context.Request.Body = GenerateStreamFromString(json.ToString());
             
             //Sad logic
-            var originalBodyStream = context.Response.Body;
+            /*var originalBodyStream = context.Response.Body;
             var response = context.Response;
-            response.Body = new MemoryStream();
+            response.Body = new MemoryStream();*/
 
             await _next(context);
             
             //process and edit response
-            JObject resultJson = await createResponseJson(context, guid);
+            /*JObject resultJson = await createResponseJson(context, guid);
             byte[] resultByteArray = Encoding.ASCII.GetBytes(resultJson.ToString());
 
             response.ContentLength = resultByteArray.Length;
-            await originalBodyStream.WriteAsync(resultByteArray);
+            await originalBodyStream.WriteAsync(resultByteArray);*/
         }
 
         private async Task<JObject> createResponseJson(HttpContext context, Guid guid)
@@ -58,7 +57,7 @@ namespace netcore_gyakorlas.Middleware
                 {"identity", guid}
             };
 
-            return resultJson;
+            return new JObject();
         }
 
         private Stream GenerateStreamFromString(string s)
