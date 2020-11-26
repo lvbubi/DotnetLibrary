@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -49,6 +50,13 @@ namespace netcore_gyakorlas.Controllers
         public ActionResult<IEnumerable<Book>> GetByYear(int year)
         {
             return Ok(_bookService.GetByYear(year));
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpGet]
+        public ActionResult<IEnumerable<Book>> GetAllLimited()
+        {
+            return Ok(_bookService.GetAll().Where(book => book.ageLimit != 0));
         }
     }
 }
