@@ -29,35 +29,10 @@ namespace netcore_gyakorlas.Middleware
 
             JObject json = String.IsNullOrEmpty(requestBodyContent) ? new JObject() : JObject.Parse(requestBodyContent);
             Guid guid = Guid.NewGuid();
-            //json.Add("guid", guid);
+            json.Add("guid", guid);
             context.Request.Body = GenerateStreamFromString(json.ToString());
-            
-            //Sad logic
-            /*var originalBodyStream = context.Response.Body;
-            var response = context.Response;
-            response.Body = new MemoryStream();*/
 
             await _next(context);
-            
-            //process and edit response
-            /*JObject resultJson = await createResponseJson(context, guid);
-            byte[] resultByteArray = Encoding.ASCII.GetBytes(resultJson.ToString());
-
-            response.ContentLength = resultByteArray.Length;
-            await originalBodyStream.WriteAsync(resultByteArray);*/
-        }
-
-        private async Task<JObject> createResponseJson(HttpContext context, Guid guid)
-        {
-            var responseBodyContent = await GetResponseBodyContent(context.Response);
-            JObject resultJson = new JObject
-            {
-                {"content", string.IsNullOrEmpty(responseBodyContent) ? "" : JContainer.Parse(responseBodyContent)},
-                {"statusCode", context.Response.StatusCode},
-                {"identity", guid}
-            };
-
-            return new JObject();
         }
 
         private Stream GenerateStreamFromString(string s)
@@ -77,17 +52,6 @@ namespace netcore_gyakorlas.Middleware
             var bodyText = await new StreamReader(request.Body).ReadToEndAsync();
 
             request.Body.Position = 0;
-
-            return bodyText;
-        }
-        
-        private async Task<string> GetResponseBodyContent(HttpResponse response)
-        {
-            response.Body.Seek(0, SeekOrigin.Begin);
-
-            string bodyText = await new StreamReader(response.Body).ReadToEndAsync();
-
-            response.Body.Seek(0, SeekOrigin.Begin);
 
             return bodyText;
         }

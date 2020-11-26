@@ -169,7 +169,16 @@ namespace netcore_gyakorlas
             app.UseAuthorization();
             
             app.UseMiddleware<GuidMiddleware>();
+            
+            app.UseMiddleware<ResultFormatMiddleware>();
             app.UseMiddleware<MinimumAgeMiddleware>();
+
+
+
+
+
+
+
 
             app.UseEndpoints(endpoints =>
             {

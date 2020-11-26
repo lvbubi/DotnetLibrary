@@ -31,20 +31,21 @@ namespace netcore_gyakorlas.Middleware
             var response = context.Response;
             response.Body = new MemoryStream();
 
-            await _next(context);
-
-            var responseBody = await GetResponseBodyContent(context.Response);
-            //process and edit response
-            var jToken = JContainer.Parse(responseBody);
-            int dateOfBirth = Convert.ToDateTime(context.User.FindFirst(c => c.Type == ClaimTypes.DateOfBirth).Value).Year;
+            using (_next(context))
+            {
+                var responseBody = await GetResponseBodyContent(context.Response);
+                //process and edit response
+                var jToken = JContainer.Parse(responseBody);
+                int dateOfBirth = Convert.ToDateTime(context.User.FindFirst(c => c.Type == ClaimTypes.DateOfBirth).Value).Year;
             
-            var filteredResult = filterResult(jToken, dateOfBirth);
+                var filteredResult = filterResult(jToken, dateOfBirth);
             
 
-            byte[] resultByteArray = Encoding.ASCII.GetBytes(filteredResult.ToString());
+                byte[] resultByteArray = Encoding.ASCII.GetBytes(filteredResult.ToString());
 
-            response.ContentLength = resultByteArray.Length;
-            await originalBodyStream.WriteAsync(resultByteArray);
+                response.ContentLength = resultByteArray.Length;
+                await originalBodyStream.WriteAsync(resultByteArray);
+            }
         }
 
         private JToken filterResult(JToken jToken, int dateOfBirth)
