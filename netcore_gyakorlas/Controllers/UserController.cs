@@ -7,7 +7,7 @@ using EventApp.Services;
 namespace EventApp.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]/[action]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class UserController : ControllerBase
     {

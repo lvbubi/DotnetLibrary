@@ -44,7 +44,7 @@ namespace netcore_gyakorlas
                         .AddAuthenticationSchemes("Bearer")
                         .RequireRole("Administrator", "User")
                         .Build();
-                    config.Filters.Add(new MyUltaSuperAuthorizationFilter(policy));
+                    //config.Filters.Add(new MyUltaSuperAuthorizationFilter(policy));
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddNewtonsoftJson(options =>
@@ -167,8 +167,10 @@ namespace netcore_gyakorlas
 
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
+            app.UseMiddleware<MyUltrasuperAuthorizationMiddleware>();
             app.UseMiddleware<GuidMiddleware>();
+            app.UseMiddleware<LoggerMiddleware>();
             
             app.UseMiddleware<ResultFormatMiddleware>();
             app.UseMiddleware<MinimumAgeMiddleware>();
