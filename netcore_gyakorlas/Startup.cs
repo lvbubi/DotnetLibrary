@@ -20,6 +20,8 @@ using System.Text;
 using System.Threading.Tasks;
 using EventApp.Controllers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Filters;
 using netcore_gyakorlas.Context;
 using netcore_gyakorlas.Middleware;
 using netcore_gyakorlas.Models;
@@ -41,7 +43,15 @@ namespace netcore_gyakorlas
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddMvc()
+            services.AddMvc(config =>
+                {
+                    var policy = new AuthorizationPolicyBuilder()
+                        .RequireAuthenticatedUser()
+                        .AddAuthenticationSchemes("Bearer")
+                        .RequireRole("Administrator", "User")
+                        .Build();
+                    config.Filters.Add(new MyUltaSuperAuthorizationFilter(policy));
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddNewtonsoftJson(options =>
                 {
@@ -123,16 +133,16 @@ namespace netcore_gyakorlas
                     };
                 });
                         
-            services.AddAuthorization(options =>
+            /*services.AddAuthorization(options =>
             {
-                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                var policy = options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("Bearer")
+                    .RequireRole("Admin", "User")
                     .Build();
-
-                // Register other policies here
-            });
+            });*/
             
+            //services.AddSingleton<IAuthorizationPolicyProvider, MinimumAgePolicyProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
