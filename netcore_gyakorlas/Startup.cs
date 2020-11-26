@@ -136,7 +136,8 @@ namespace netcore_gyakorlas
             });
             
             services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
-            
+
+            services.AddSwaggerGen();
             /*services.AddAuthorization(options =>
             {
                 var policy = options.FallbackPolicy = new AuthorizationPolicyBuilder()
@@ -163,6 +164,12 @@ namespace netcore_gyakorlas
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+            
             app.UseRouting();
 
             app.UseAuthentication();
