@@ -53,7 +53,7 @@ namespace netcore_gyakorlas.Middleware
             var responseBodyContent = await GetResponseBodyContent(context.Response);
             JObject resultJson = new JObject
             {
-                {"content", JContainer.Parse(responseBodyContent)},
+                {"content", string.IsNullOrEmpty(responseBodyContent) ? "" : JContainer.Parse(responseBodyContent)},
                 {"statusCode", context.Response.StatusCode},
                 {"identity", guid}
             };
