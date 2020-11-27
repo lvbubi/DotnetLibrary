@@ -6,7 +6,7 @@ using netcore_gyakorlas.Services;
 namespace netcore_gyakorlas.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class LibraryController : ControllerBase
     {
