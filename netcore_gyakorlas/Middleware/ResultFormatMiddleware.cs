@@ -32,7 +32,7 @@ namespace netcore_gyakorlas.Middleware
             await _next(context);
             
 
-            var resultJson = await createResponseJson(response, new JObject());
+            var resultJson = await createResponseJson(response, JObject.Parse(requestBodyContent));
             byte[] resultByteArray = Encoding.ASCII.GetBytes(resultJson.ToString());
 
             response.ContentLength = resultByteArray.Length;
@@ -45,8 +45,8 @@ namespace netcore_gyakorlas.Middleware
             JObject resultJson = new JObject
             {
                 {"content", string.IsNullOrEmpty(responseBodyContent) ? "" : JToken.Parse(responseBodyContent)},
-                {"statusCode", response.StatusCode}
-                //guid
+                {"statusCode", response.StatusCode},
+                { "identity", guid.GetValue("guid")}
             };
 
             return resultJson;

@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using netcore_gyakorlas.Context;
 using netcore_gyakorlas.Middleware;
 using netcore_gyakorlas.Models;
@@ -37,15 +38,7 @@ namespace netcore_gyakorlas
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddMvc(config =>
-                {
-                    var policy = new AuthorizationPolicyBuilder()
-                        .RequireAuthenticatedUser()
-                        .AddAuthenticationSchemes("Bearer")
-                        .RequireRole("Administrator", "User")
-                        .Build();
-                    //config.Filters.Add(new MyUltaSuperAuthorizationFilter(policy));
-                })
+            services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddNewtonsoftJson(options =>
                 {
@@ -142,7 +135,7 @@ namespace netcore_gyakorlas
             services.AddSwaggerGen();
             services.AddAuthorization(options =>
             {
-                var policy = options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("Bearer")
                     .RequireRole("Administrator", "User")
@@ -163,6 +156,22 @@ namespace netcore_gyakorlas
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            
+            
+            app.UseExceptionHandler(errorApp =>
+            {
+                errorApp.Run(async context =>
+                {
+                    var exceptionHandlerPathFeature =
+                        context.Features.Get<IExceptionHandlerPathFeature>();
+
+                    if (exceptionHandlerPathFeature?.Error is UnauthorizedAccessException)
+                    {
+                        context.Response.StatusCode = 403;
+                    }
+                });
+            });
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -182,7 +191,7 @@ namespace netcore_gyakorlas
             app.UseMiddleware<LoggerMiddleware>();
             
             app.UseMiddleware<ResultFormatMiddleware>();
-            //app.UseMiddleware<MinimumAgeMiddleware>();
+            app.UseMiddleware<MinimumAgeMiddleware>();
             
             app.UseEndpoints(endpoints =>
             {

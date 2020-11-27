@@ -24,7 +24,8 @@ namespace netcore_gyakorlas.Middleware
 
             if (context.Request.Method != "GET" && context.User.IsInRole("User"))
             {
-                //throw new UnauthorizedAccessException();
+                context.Response.StatusCode = 403;
+                throw new UnauthorizedAccessException();
             }
 
             await _next(context);

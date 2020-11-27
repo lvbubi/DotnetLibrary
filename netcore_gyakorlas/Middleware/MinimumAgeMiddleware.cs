@@ -25,27 +25,24 @@ namespace netcore_gyakorlas.Middleware
                 await _next(context);
                 return;
             }
-
-            //Sad logic
+            
             var originalBodyStream = context.Response.Body;
             var response = context.Response;
             response.Body = new MemoryStream();
-
-            using (_next(context))
-            {
-                var responseBody = await GetResponseBodyContent(context.Response);
-                //process and edit response
-                var jToken = JToken.Parse(responseBody);
-                int dateOfBirth = Convert.ToDateTime(context.User.FindFirst(c => c.Type == ClaimTypes.DateOfBirth).Value).Year;
             
-                var filteredResult = filterResult(jToken, dateOfBirth);
+            await _next(context);
             
+            var responseBody = await GetResponseBodyContent(context.Response);
 
-                byte[] resultByteArray = Encoding.ASCII.GetBytes(filteredResult.ToString());
+            var jToken = JToken.Parse(responseBody);
+            int dateOfBirth = Convert.ToDateTime(context.User.FindFirst(c => c.Type == ClaimTypes.DateOfBirth).Value).Year;
+            
+            var filteredResult = filterResult(jToken, dateOfBirth);
+            
+            byte[] resultByteArray = Encoding.ASCII.GetBytes(filteredResult.ToString());
 
-                response.ContentLength = resultByteArray.Length;
-                await originalBodyStream.WriteAsync(resultByteArray);
-            }
+            response.ContentLength = resultByteArray.Length;
+            await originalBodyStream.WriteAsync(resultByteArray);
         }
 
         private JToken filterResult(JToken jToken, int dateOfBirth)
@@ -64,7 +61,7 @@ namespace netcore_gyakorlas.Middleware
 
                 return jToken;
             }
-            else if (jToken.GetType() == typeof(JObject))
+            if (jToken.GetType() == typeof(JObject))
             {
                 if (int.Parse(jToken["ageLimit"].ToString()) < userAge)
                 {
