@@ -35,7 +35,7 @@ namespace netcore_gyakorlas.Middleware
             {
                 var responseBody = await GetResponseBodyContent(context.Response);
                 //process and edit response
-                var jToken = JContainer.Parse(responseBody);
+                var jToken = JToken.Parse(responseBody);
                 int dateOfBirth = Convert.ToDateTime(context.User.FindFirst(c => c.Type == ClaimTypes.DateOfBirth).Value).Year;
             
                 var filteredResult = filterResult(jToken, dateOfBirth);

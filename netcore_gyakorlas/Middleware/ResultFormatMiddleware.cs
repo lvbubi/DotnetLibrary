@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,9 +28,9 @@ namespace netcore_gyakorlas.Middleware
             var response = context.Response;
             response.Body = new MemoryStream();
             
+            var requestBodyContent = await GetRequestBodyContent(context.Request);
             await _next(context);
             
-            var requestBodyContent = await GetRequestBodyContent(context.Request);
 
             var resultJson = await createResponseJson(response, new JObject());
             byte[] resultByteArray = Encoding.ASCII.GetBytes(resultJson.ToString());

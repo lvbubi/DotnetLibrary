@@ -177,9 +177,9 @@ namespace netcore_gyakorlas
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //app.UseMiddleware<MyUltrasuperAuthorizationMiddleware>();
-            //app.UseMiddleware<GuidMiddleware>();
-            //app.UseMiddleware<LoggerMiddleware>();
+            app.UseMiddleware<MyUltrasuperAuthorizationMiddleware>();
+            app.UseMiddleware<GuidMiddleware>();
+            app.UseMiddleware<LoggerMiddleware>();
             
             app.UseMiddleware<ResultFormatMiddleware>();
             //app.UseMiddleware<MinimumAgeMiddleware>();
