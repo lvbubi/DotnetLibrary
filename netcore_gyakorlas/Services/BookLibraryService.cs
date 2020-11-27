@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using EventApp.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using netcore_gyakorlas.Models;
 using netcore_gyakorlas.UnitOfWork;
@@ -18,9 +20,11 @@ namespace netcore_gyakorlas.Services
     {
         
         private readonly ILogger<LibraryService> _logger;
+        private readonly IMemoryCache _memoryCache;
         
-        public BookLibraryService(IUnitOfWork unitOfWork, ILogger<LibraryService> logger) : base(unitOfWork)
+        public BookLibraryService(IUnitOfWork unitOfWork, ILogger<LibraryService> logger, IMemoryCache memoryCache) : base(unitOfWork)
         {
+            _memoryCache = memoryCache; 
             _logger = logger;
         }
 
@@ -31,20 +35,34 @@ namespace netcore_gyakorlas.Services
         
         public IEnumerable<BookLibrary> GetAll()
         {
+            if (!_memoryCache.TryGetValue("bookLibraries", out IEnumerable<BookLibrary> bookLibraries))
+            {
+                return refreshBookLibraries();
+            }
             Log("GetAll");
-            return UnitOfWork.GetRepository<BookLibrary>().GetAll()
-                .Include(bl => bl.Library)
-                .Include(bl => bl.Book);
-
+            return bookLibraries;
         }
 
         public BookLibrary Create(BookLibrary newBookLibrary)
         {
             Log("Create");
             newBookLibrary.Id = 0;
+            
             UnitOfWork.GetRepository<BookLibrary>().Create(newBookLibrary);
             UnitOfWork.SaveChanges();
+
+            refreshBookLibraries();
+            
             return newBookLibrary;
+        }
+
+        private IEnumerable<BookLibrary> refreshBookLibraries()
+        {
+            var bookLibraries = UnitOfWork.GetRepository<BookLibrary>().GetAll()
+                .Include(bl => bl.Library)
+                .Include(bl => bl.Book).ToList();
+            _memoryCache.Set("bookLibraries", bookLibraries);
+            return bookLibraries;
         }
     }
 }

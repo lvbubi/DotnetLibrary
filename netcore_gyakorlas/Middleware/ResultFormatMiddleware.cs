@@ -25,32 +25,29 @@ namespace netcore_gyakorlas.Middleware
                 return;
             }
             
-            var requestBodyContent = await GetRequestBodyContent(context.Request);
-
-            //Sad logic
             var originalBodyStream = context.Response.Body;
             var response = context.Response;
             response.Body = new MemoryStream();
+            
+            await _next(context);
+            
+            var requestBodyContent = await GetRequestBodyContent(context.Request);
 
-            using (_next(context))
-            {
-                //process and edit response
-                JObject resultJson = await createResponseJson(context, JObject.Parse(requestBodyContent)["guid"]?.ToString());
-                byte[] resultByteArray = Encoding.ASCII.GetBytes(resultJson.ToString());
+            var resultJson = await createResponseJson(response, new JObject());
+            byte[] resultByteArray = Encoding.ASCII.GetBytes(resultJson.ToString());
 
-                response.ContentLength = resultByteArray.Length;
-                await originalBodyStream.WriteAsync(resultByteArray);
-            }
+            response.ContentLength = resultByteArray.Length;
+            await originalBodyStream.WriteAsync(resultByteArray);
         }
 
-        private async Task<JObject> createResponseJson(HttpContext context, String guid)
+        private async Task<JObject> createResponseJson(HttpResponse response, JObject guid)
         {
-            var responseBodyContent = await GetResponseBodyContent(context.Response);
+            var responseBodyContent = await GetResponseBodyContent(response);
             JObject resultJson = new JObject
             {
-                {"content", string.IsNullOrEmpty(responseBodyContent) ? "" : JContainer.Parse(responseBodyContent)},
-                {"statusCode", context.Response.StatusCode},
-                {"identity", guid}
+                {"content", string.IsNullOrEmpty(responseBodyContent) ? "" : JToken.Parse(responseBodyContent)},
+                {"statusCode", response.StatusCode}
+                //guid
             };
 
             return resultJson;

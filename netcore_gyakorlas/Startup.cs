@@ -69,6 +69,8 @@ namespace netcore_gyakorlas
                 return settings;
             };
 
+
+            services.AddMemoryCache();
             services.AddDbContext<BookDbContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("BookDatabase")));
 
@@ -138,14 +140,14 @@ namespace netcore_gyakorlas
             services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
 
             services.AddSwaggerGen();
-            /*services.AddAuthorization(options =>
+            services.AddAuthorization(options =>
             {
                 var policy = options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("Bearer")
                     .RequireRole("Administrator", "User")
                     .Build();
-            });*/
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -175,20 +177,13 @@ namespace netcore_gyakorlas
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseMiddleware<MyUltrasuperAuthorizationMiddleware>();
-            app.UseMiddleware<GuidMiddleware>();
-            app.UseMiddleware<LoggerMiddleware>();
+            //app.UseMiddleware<MyUltrasuperAuthorizationMiddleware>();
+            //app.UseMiddleware<GuidMiddleware>();
+            //app.UseMiddleware<LoggerMiddleware>();
             
             app.UseMiddleware<ResultFormatMiddleware>();
-            app.UseMiddleware<MinimumAgeMiddleware>();
-
-
-
-
-
-
-
-
+            //app.UseMiddleware<MinimumAgeMiddleware>();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

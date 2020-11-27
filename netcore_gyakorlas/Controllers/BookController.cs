@@ -20,7 +20,6 @@ namespace netcore_gyakorlas.Controllers
             _bookService = bookService;
         }
         
-        [Authorize(Roles = "Administrator")]
         [HttpGet]
         public ActionResult<IEnumerable<Book>> GetAll()
         {
