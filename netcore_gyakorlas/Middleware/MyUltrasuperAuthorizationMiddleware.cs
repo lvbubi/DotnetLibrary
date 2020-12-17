@@ -22,9 +22,9 @@ namespace netcore_gyakorlas.Middleware
                 return;
             }
 
-            if (context.Request.Method != "GET" && context.User.IsInRole("User"))
+            if (context.Request.Method != "GET" && !context.User.IsInRole("Administrator"))
             {
-                context.Response.StatusCode = 403;
+                //context.Response.StatusCode = 403;
                 throw new UnauthorizedAccessException();
             }
 

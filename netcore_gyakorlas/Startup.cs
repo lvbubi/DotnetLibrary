@@ -132,19 +132,16 @@ namespace netcore_gyakorlas
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("AtLeast12", policy => policy.Requirements.Add(new MinimumAgeRequirement(12)));
-            });
-            
-            services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
-
-            services.AddSwaggerGen();
-            services.AddAuthorization(options =>
-            {
                 options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .AddAuthenticationSchemes("Bearer")
                     .RequireRole("Administrator", "User")
                     .Build();
             });
+            
+            services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
+
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -163,30 +160,7 @@ namespace netcore_gyakorlas
             
             app.UseWebSockets();
             app.UseMiddleware<BookUploaderWebsocket>();
-            /*app.Use(async (context, next) =>
-            {
-                if (context.Request.Path == "/ws")
-                {
-                    if (context.WebSockets.IsWebSocketRequest)
-                    {
-                        using (WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync())
-                        {
-                            await Echo(context, webSocket);
-                        }
-                    }
-                    else
-                    {
-                        context.Response.StatusCode = 400;
-                    }
-                }
-                else
-                {
-                    await next();
-                }
 
-            });*/
-            
-            
             app.UseExceptionHandler(errorApp =>
             {
                 errorApp.Run(async context =>
